@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
     postgres_port: int = int(os.getenv("POSTGRES_PORT", 5432))
     postgres_db: str = os.getenv("POSTGRES_DB", "postgres")
+    secret_key: str = os.getenv("SECRET_KEY", "a_very_secret_key")
     
     cors_allowed_origins: list[str] = ["http://localhost:3000"]
     
