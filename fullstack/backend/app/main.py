@@ -2,11 +2,13 @@ from collections.abc import AsyncGenerator
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
+from app.core.engine import warm_up_connections
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     print("API lifespan started")
-    # TODO: add default data in the database
+    await warm_up_connections()
     # TODO: warmup database and cache connections
     yield
     # close all connections

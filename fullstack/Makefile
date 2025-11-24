@@ -1,5 +1,5 @@
 run-api-dev:
-	cd api && fastapi dev main.py
+	cd backend && uv run fastapi dev app/main.py
 
 run-web-dev:
 	cd web && npm run dev
