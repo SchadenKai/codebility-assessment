@@ -9,7 +9,7 @@ from alembic import context
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.core.engine import build_connection_string
+from app.core.engine import SYNC_DB_API, build_connection_string
 from app.repository.models import Base
 
 # this is the Alembic Config object, which provides
@@ -46,7 +46,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = build_connection_string(db_api="psycopg2")
+    url = build_connection_string(db_api=SYNC_DB_API)
     context.configure(
         url=url,
         target_metadata=target_metadata,
