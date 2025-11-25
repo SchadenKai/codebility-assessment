@@ -30,6 +30,42 @@ def build_connection_string(
     return f"postgresql+{db_api}://{user}:{password}@{host}:{port}/{db}"
 
 
+def build_connecting_string_supabase(
+    db_password: str = settings.postgres_password,
+) -> str:
+    return f"postgresql://postgres.vhrtcxtfiflxrvowhozo:{db_password}@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
+
+
+class SupabaseEngine:
+    _engine: Engine | None = None
+    _lock: threading.Lock = threading.Lock()
+
+    @classmethod
+    def _init_engine(cls) -> Engine:
+        try:
+            if not cls._engine:
+                conn_string = build_connecting_string_supabase()
+                cls._engine = create_engine(conn_string)
+        except Exception as e:
+            print(f"Error initializing the database engine: {e}")
+            raise
+        return cls._engine
+
+    @classmethod
+    def get_engine(cls) -> Engine:
+        """Gets the sql alchemy engine. Will init a default engine if init hasn't
+        already been called. You probably want to init first!"""
+        try:
+            if not cls._engine:
+                with cls._lock:
+                    if not cls._engine:
+                        cls._engine = cls._init_engine()
+        except Exception as e:
+            print(f"Error getting the database engine: {e}")
+            raise
+        return cls._engine
+
+
 class SqlEngine:
     _engine: Engine | None = None
     _lock: threading.Lock = threading.Lock()
@@ -82,7 +118,7 @@ def get_session_context_manager() -> ContextManager[Session]:
 
 def get_sync_engine() -> Engine:
     print("Getting sync engine")
-    return SqlEngine.get_engine()
+    return SupabaseEngine.get_engine()
 
 
 def get_async_engine() -> AsyncEngine:
@@ -106,7 +142,7 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def warm_up_connections(
-    sync_conn_to_warmup: int = 20, async_conn_to_warmup: int = 10
+    sync_conn_to_warmup: int = 10, async_conn_to_warmup: int = 10
 ) -> None:
     print("Warming up database connections...")
     sync_postgres_engine = get_sync_engine()
@@ -116,21 +152,21 @@ async def warm_up_connections(
     for conn in connections:
         conn.close()
 
-    async_postgres_engine = get_async_engine()
-    async_connections = [
-        await async_postgres_engine.connect() for _ in range(async_conn_to_warmup)
-    ]
-    for async_conn in async_connections:
-        await async_conn.execute(text("SELECT 1"))
-    for async_conn in async_connections:
-        await async_conn.close()
+    # async_postgres_engine = get_async_engine()
+    # async_connections = [
+    #     await async_postgres_engine.connect() for _ in range(async_conn_to_warmup)
+    # ]
+    # for async_conn in async_connections:
+    #     await async_conn.execute(text("SELECT 1"))
+    # for async_conn in async_connections:
+    #     await async_conn.close()
 
 
 def get_session_factory(fresh=False, expire_on_commit=True) -> sessionmaker[Session]:
     global SessionFactory
     if SessionFactory is None or fresh:
         SessionFactory = sessionmaker(
-            bind=SqlEngine.get_engine(),
+            bind=SupabaseEngine.get_engine(),
             expire_on_commit=expire_on_commit,
         )
     return SessionFactory

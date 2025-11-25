@@ -9,13 +9,17 @@ from alembic import context
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.core.engine import SYNC_DB_API, build_connection_string
+from app.core.engine import (
+    SYNC_DB_API,
+    build_connecting_string_supabase,
+    build_connection_string,
+)
 from app.repository.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", build_connection_string(db_api="psycopg2"))
+config.set_main_option("sqlalchemy.url", build_connecting_string_supabase())
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
