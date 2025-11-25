@@ -21,7 +21,7 @@ def create_product_api(
 
 
 @admin_router.get("")
-def list_producuts_api(
+def list_products_for_admin_api(
     db_session: Session = Depends(get_session),
 ) -> list[PublicProductModel]:
     pass
@@ -43,5 +43,5 @@ def get_product_api(id: int) -> PublicProductModel:
 
 
 @router.get("")
-def list_products_api() -> list[PublicProductModel]:
+def list_products_for_users_api() -> list[PublicProductModel]:
     pass
