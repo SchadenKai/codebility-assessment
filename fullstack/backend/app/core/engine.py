@@ -23,7 +23,7 @@ def build_connection_string(
     db_api: str = ASYNC_DB_API,
     user: str = settings.postgres_user,
     password: str = settings.postgres_password,
-host: str = settings.postgres_host,
+    host: str = settings.postgres_host,
     port: str = settings.postgres_port,
     db: str = settings.postgres_db,
 ) -> str:
@@ -72,9 +72,6 @@ class SqlEngine:
 
 
 def get_session() -> Generator[Session, None, None]:
-    # The line below was added to monitor the latency caused by Postgres connections
-    # during API calls.
-    # with tracer.trace("db.get_session"):
     with Session(get_sync_engine(), expire_on_commit=False) as session:
         yield session
 

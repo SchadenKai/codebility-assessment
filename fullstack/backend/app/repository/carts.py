@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 
-class CartsServices:
+class CartsRepository:
     def __init__(self, db_session: Session):
         _db_session = db_session
 

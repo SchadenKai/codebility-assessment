@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 
-class ProductsService:
+class ProductsRepository:
     def __init__(self, db_session: Session) -> None:
         _db_session = db_session
 

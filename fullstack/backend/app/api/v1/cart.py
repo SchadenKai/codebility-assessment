@@ -3,18 +3,22 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/carts", tags=["carts"])
 
-@router.get("/all")
-def get_all_users_carts() -> list[any]:
-    pass
 
 @router.post("")
-def add_product_to_cart() -> int:
+def add_product_to_cart():
     pass
 
-@router.patch("")
-def update_cart() -> int:
+
+@router.get("")
+def get_all_items_for_user():
     pass
 
-@router.delete("")
-def delete_item_in_cart() -> int:
+
+@router.patch("/{product_id}")
+def update_item_quantity(product_id: int):
+    pass
+
+
+@router.patch("/{product_id}")
+def delete_item(product_id: int):
     pass
