@@ -1,13 +1,15 @@
+from fastapi import Depends, HTTPException
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
 from app.models.products import CreateProductModel, ProductModel, PublicProductModel, UpdateProductModel
 from app.repository.models import Product
 from app.exceptions import InternalServerException
+from app.core.engine import get_session
 
 
 class ProductsRepository:
-    def __init__(self, db_session: Session) -> None:
+    def __init__(self, db_session: Session = Depends(get_session)) -> None:
         self._db_session = db_session
 
     def create_product(self, new_product: CreateProductModel):
@@ -71,15 +73,19 @@ class ProductsRepository:
     def update_product(self, product_id: int, updated_product: UpdateProductModel):
         try:
             stmt = update(Product).where(Product.id == product_id).values()
-            product = self._db_session.query(stmt)
+            product = self._db_session.execute(stmt)
             return product
         except Exception as e:
-            raise InternalServerException(status_code=500, exception_message=e)
+            raise InternalServerException(status_code=500, exception_message=e) from e
 
-    def delete_product(self, product_id: int):
+    def delete_product(self, product_id: int) -> bool:
         try:
             stmt = delete(Product).where(Product.id == product_id)
-            product = self._db_session.query(stmt)
-            return product
+            product = self._db_session.execute(stmt)
+            if product.rowcount == 0:
+                raise HTTPException(status_code=404)
+            return True
+        except HTTPException as e:
+            raise HTTPException(status_code=404, detail=f"Product {product_id} is not found")
         except Exception as e:
-            raise InternalServerException(status_code=500, exception_message=e)
+            raise InternalServerException(exception_message=e) from e

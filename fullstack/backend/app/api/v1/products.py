@@ -7,6 +7,7 @@ from app.models.products import (
     PublicProductModel,
     UpdateProductModel,
 )
+from app.services.products import ProductsService
 
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -33,8 +34,8 @@ def update_product_api(req: UpdateProductModel, id: int) -> ProductModel:
 
 
 @admin_router.delete("/{id}")
-def delete_product_api(id: int) -> None:
-    pass
+def delete_product_api(id: int, service: ProductsService = Depends()) -> bool:
+    return service.delete_product(id), 
 
 
 @router.get("/{id}")

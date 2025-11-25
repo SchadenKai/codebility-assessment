@@ -5,4 +5,4 @@ class InternalServerException(Exception):
         exception_message: Exception | None = None,
     ):
         self.message = f"{message}: {exception_message}"
-        super.__init__(self.message)
+        super() .__init__(self.message)

@@ -1,9 +1,12 @@
+from fastapi import Depends
 from sqlalchemy.orm import Session
+
+from app.repository.products import ProductsRepository
 
 
 class ProductsService:
-    def __init__(self, db_session: Session) -> None:
-        _db_session = db_session
+    def __init__(self, repo: ProductsRepository = Depends()) -> None:
+        self.repo = repo
 
     def create_product():
         pass
@@ -20,5 +23,5 @@ class ProductsService:
     def update_product():
         pass
 
-    def delete_product():
-        pass
+    def delete_product(self, product_id: int) -> bool:
+        return self.repo.delete_product(product_id)
